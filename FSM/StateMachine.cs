@@ -1,19 +1,17 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace StateMachine
+namespace FSM
 {
-    public abstract class StateMachine : MonoBehaviour
+    public class StateMachine : MonoBehaviour
     {
         public State CurrentState { get; private set; }
 
         private State _nextState;
-        private State _mainState;
+        private State _defaultState;
 
-        private void Awake()
+        private void Start()
         {
-            SetNextStateToMain();
+            SetNextStateToDefault();
         }
 
         private void Update()
@@ -42,17 +40,14 @@ namespace StateMachine
             _nextState = newState;
         }
 
-        public void SetNextStateToMain()
+        public void SetNextStateToDefault()
         {
-            _nextState = _mainState;
+            _nextState = _defaultState;
         }
-
-        private void OnValidate()
+        
+        public void SetDefaultState(State state)
         {
-            if (_mainState == null)
-            {
-                // TODO: _mainState = new EarthquakeState(); 
-            }
+            _defaultState = state;
         }
     }
 }

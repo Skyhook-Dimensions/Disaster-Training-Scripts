@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace StateMachine
+namespace FSM
 {
 	public abstract class State
 	{
@@ -12,35 +12,38 @@ namespace StateMachine
 		{
 			this.stateMachine = newStateMachine;
 		}
+
 		public virtual void UpdateState()
 		{
-			CurrentTime += Time.deltaTime; 
+			CurrentTime += Time.deltaTime;
 		}
 
-		public virtual void OnExitState() { }
-		
+		public virtual void OnExitState()
+		{
+		}
+
 		#region PassThroughMethods
 
 		protected static void Destroy(Object obj)
 		{
 			Object.Destroy(obj);
 		}
-		
+
 		protected T GetComponent<T>() where T : Component
 		{
 			return stateMachine.GetComponent<T>();
 		}
-		
+
 		protected Component GetComponent(System.Type type)
 		{
 			return stateMachine.GetComponent(type);
 		}
-		
+
 		protected Component GetComponent(string type)
 		{
 			return stateMachine.GetComponent(type);
 		}
-		
+
 		#endregion
 	}
 }
