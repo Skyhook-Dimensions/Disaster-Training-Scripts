@@ -1,3 +1,4 @@
+using EarthQuake.EarthquakeStateMachine;
 using UnityEngine;
 
 namespace FSM
@@ -35,7 +36,7 @@ namespace FSM
             CurrentState?.OnEnterState(this);
         }
         
-        public void SetNextState(State newState)
+        public void SwitchToNextState(State newState)
         {
             _nextState = newState;
         }
