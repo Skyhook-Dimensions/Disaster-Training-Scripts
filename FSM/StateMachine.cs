@@ -1,54 +1,106 @@
-using EarthQuake.EarthquakeStateMachine;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FSM
 {
     public class StateMachine : MonoBehaviour
     {
-        public State CurrentState { get; private set; }
-
-        private State _nextState;
-        private State _defaultState;
-
-        private void Start()
-        {
-            SetNextStateToDefault();
-        }
+        private StateNode _current;
+        private Dictionary<Type, StateNode> _nodes = new();
+        private HashSet<ITransition> _anyTransitions = new();
 
         private void Update()
         {
-            if (_nextState != null)
+            var transition = GetTransition();
+            if (transition != null)
             {
-                SetState(_nextState);
-                _nextState = null;
+                ChangeState(transition.To);
             }
             
-            if (CurrentState != null)
-            {
-                CurrentState.UpdateState();
-            }
-        }
-        
-        private void SetState(State nextState)
-        {
-            CurrentState?.OnExitState();
-            CurrentState = nextState;
-            CurrentState?.OnEnterState(this);
-        }
-        
-        public void SwitchToNextState(State newState)
-        {
-            _nextState = newState;
+            _current.State?.Update();
         }
 
-        public void SetNextStateToDefault()
+        public void SetState(IState state)
         {
-            _nextState = _defaultState;
+            _current = _nodes[state.GetType()];
+            _current.State?.OnEnter();
+        }
+
+        void ChangeState(IState state)
+        {
+            if (_current.State == state) return;
+            var previousState = _current.State;
+            var nextState = _nodes[state.GetType()].State;
+            
+            previousState?.OnExit();
+            nextState?.OnEnter();
+            _current = _nodes[state.GetType()];
+        }
+
+        private ITransition GetTransition()
+        {
+            foreach (var transition in _anyTransitions)
+            {
+                if (transition.Condition.Evaluate())
+                    return transition;
+            }
+
+            foreach (var transition in _current.Transitions)
+            {
+                if (transition.Condition.Evaluate())
+                    return transition;
+            }
+
+            return null;
+        }
+
+        public void AddAnyTransition(IState to, IPredicate condition)
+        {
+            _anyTransitions.Add(new Transition(GetOrAddNode(to).State, condition));
         }
         
-        public void SetDefaultState(State state)
+        public void AddTransition(IState from, IState to, IPredicate condition)
         {
-            _defaultState = state;
+            GetOrAddNode(from).AddTransition(to, condition);
+        }
+        
+        private StateNode GetOrAddNode(IState state)
+        {
+            var node = _nodes.GetValueOrDefault(state.GetType());
+            if (node == null)
+            {
+                node = new StateNode(state);
+                _nodes.Add(state.GetType(), node);
+            }
+            return node;
+        }
+
+        private void FixedUpdate()
+        {
+            _current.State?.FixedUpdate();
+        }
+
+        private void LateUpdate()
+        {
+            _current.State?.LateUpdate();
+        }
+
+        class StateNode
+        {
+            public IState State { get; }
+            public HashSet<ITransition> Transitions { get; }
+
+            public StateNode(IState state)
+            {
+                State = state;
+                Transitions = new HashSet<ITransition>();
+            }
+            
+            public void AddTransition(IState to, IPredicate condition)
+            {
+                Transitions.Add(new Transition(to, condition));
+            }
         }
     }
 }

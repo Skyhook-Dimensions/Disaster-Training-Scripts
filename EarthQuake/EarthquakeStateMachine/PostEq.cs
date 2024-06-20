@@ -3,29 +3,7 @@ using UnityEngine;
 
 namespace EarthQuake.EarthquakeStateMachine
 {
-    public class PostEq : EarthQuakeBaseState
+    public class PostEq : EqBaseState
     {
-        private float _stateDuration = 5f;
-        public override void OnEnterState(StateMachine newStateMachine)
-        {
-            base.OnEnterState(newStateMachine);
-            Debug.Log("PostEq Enter");
-        }
-        
-        public override void UpdateState()
-        {
-            base.UpdateState();
-            Debug.Log("PostEq Update");
-            if (CurrentTime >= _stateDuration)
-            {
-                stateMachine.SetNextStateToDefault();
-            }
-        }
-        
-        public override void OnExitState()
-        {
-            base.OnExitState();
-            Debug.Log("PostEq Exit");
-        }
     }
 }
