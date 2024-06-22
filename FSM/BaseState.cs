@@ -1,30 +1,30 @@
 ﻿namespace FSM
 {
-	public abstract class BaseState : IState
-	{
-		public void OnEnter()
-		{
-			// noop
-		}
+    public abstract class BaseState : IState
+    {
+        public virtual void OnEnter()
+        {
+            // noop
+        }
 
-		public void Update()
-		{
-			// noop
-		}
+        public virtual void OnUpdate()
+        {
+            // noop
+        }
 
-		public void FixedUpdate()
-		{
-			//noop
-		}
+        public virtual void OnFixedUpdate()
+        {
+            //noop
+        }
 
-		public void LateUpdate()
-		{
-			//noop
-		}
+        public virtual void OnLateUpdate()
+        {
+            //noop
+        }
 
-		public void OnExit()
-		{
-			//noop
-		}
-	}
+        public virtual void OnExit()
+        {
+            //noop
+        }
+    }
 }

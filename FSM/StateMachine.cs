@@ -10,29 +10,43 @@ namespace FSM
         private Dictionary<Type, StateNode> _nodes = new();
         private HashSet<ITransition> _anyTransitions = new();
 
-        private void Update()
+        public void OnUpdate()
         {
             var transition = GetTransition();
             if (transition != null)
             {
                 ChangeState(transition.To);
             }
-            
-            _current.State?.Update();
+
+            _current.State?.OnUpdate();
         }
 
+        public void OnFixedUpdate()
+        {
+            _current.State?.OnFixedUpdate();
+        }
+
+        public void OnLateUpdate()
+        {
+            _current.State?.OnLateUpdate();
+        }
+
+        /// <summary>
+        /// Sets the current state of the state machine.
+        /// </summary>
+        /// <param name="state">The state to set.</param>
         public void SetState(IState state)
         {
             _current = _nodes[state.GetType()];
             _current.State?.OnEnter();
         }
 
-        void ChangeState(IState state)
+        private void ChangeState(IState state)
         {
             if (_current.State == state) return;
             var previousState = _current.State;
             var nextState = _nodes[state.GetType()].State;
-            
+
             previousState?.OnExit();
             nextState?.OnEnter();
             _current = _nodes[state.GetType()];
@@ -55,16 +69,27 @@ namespace FSM
             return null;
         }
 
+        /// <summary>
+        /// Adds a transition that can be triggered from any state to the specified state.
+        /// </summary>
+        /// <param name="to">The state to transition to.</param>
+        /// <param name="condition">The condition that must be satisfied for the transition to occur.</param>
         public void AddAnyTransition(IState to, IPredicate condition)
         {
             _anyTransitions.Add(new Transition(GetOrAddNode(to).State, condition));
         }
-        
+
+        /// <summary>
+        /// Adds a transition from one state to another state with a specified condition.
+        /// </summary>
+        /// <param name="from">The state to transition from.</param>
+        /// <param name="to">The state to transition to.</param>
+        /// <param name="condition">The condition that must be satisfied for the transition to occur.</param>
         public void AddTransition(IState from, IState to, IPredicate condition)
         {
-            GetOrAddNode(from).AddTransition(to, condition);
+            GetOrAddNode(from).AddTransition(GetOrAddNode(to).State, condition);
         }
-        
+
         private StateNode GetOrAddNode(IState state)
         {
             var node = _nodes.GetValueOrDefault(state.GetType());
@@ -76,17 +101,7 @@ namespace FSM
             return node;
         }
 
-        private void FixedUpdate()
-        {
-            _current.State?.FixedUpdate();
-        }
-
-        private void LateUpdate()
-        {
-            _current.State?.LateUpdate();
-        }
-
-        class StateNode
+        private class StateNode
         {
             public IState State { get; }
             public HashSet<ITransition> Transitions { get; }
@@ -96,7 +111,7 @@ namespace FSM
                 State = state;
                 Transitions = new HashSet<ITransition>();
             }
-            
+
             public void AddTransition(IState to, IPredicate condition)
             {
                 Transitions.Add(new Transition(to, condition));

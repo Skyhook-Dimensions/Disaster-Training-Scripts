@@ -1,9 +1,12 @@
 using FSM;
 using UnityEngine;
 
-namespace EarthQuake.EarthquakeStateMachine
+namespace Eq.EqStateMachine
 {
     public class EqInit : EqBaseState
     {
+        public EqInit(float duration) : base(duration)
+        {
+        }
     }
 }
