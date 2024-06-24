@@ -10,6 +10,8 @@ namespace FSM
         private Dictionary<Type, StateNode> _nodes = new();
         private HashSet<ITransition> _anyTransitions = new();
 
+        public Action<IState> OnStateChanged;
+
         public void OnUpdate()
         {
             var transition = GetTransition();
@@ -49,6 +51,7 @@ namespace FSM
 
             previousState?.OnExit();
             nextState?.OnEnter();
+            OnStateChanged?.Invoke(nextState);
             _current = _nodes[state.GetType()];
         }
 

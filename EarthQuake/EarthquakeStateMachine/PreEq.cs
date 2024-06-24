@@ -12,13 +12,11 @@ namespace Eq.EqStateMachine
         public override void OnEnter()
         {
             base.OnEnter();
-            Debug.Log(this.GetType() + " Enter");
         }
 
         public override void OnExit()
         {
             base.OnExit();
-            Debug.Log(this.GetType() + " Exit");
         }
     }
 }
