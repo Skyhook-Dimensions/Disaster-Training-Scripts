@@ -1,6 +1,4 @@
-﻿using FSM;
-
-namespace Eq.EqStateMachine
+﻿namespace Eq.EqStateMachine
 {
     /// <summary>
     /// This is an empty state for the state machine to default to.

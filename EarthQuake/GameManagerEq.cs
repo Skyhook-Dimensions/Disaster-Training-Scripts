@@ -1,5 +1,6 @@
 using System;
 using Eq.EqStateMachine;
+using EventSystem;
 using Utils;
 using UnityEngine;
 using FSM;
@@ -16,10 +17,16 @@ namespace EarthQuake
         [SerializeField] private float _duringEqDuration = 5f;
         [SerializeField] private float _postEqDuration = 5f;
         [SerializeField] private float _passEqDuration = 5f;
+        [SerializeField] private float _eqInitDuration = 5f;
         // [SerializeField] private float _failEqDuration = 5f;
-        // [SerializeField] private float _eqInitDuration = 5f;
 
         #endregion EqState properties
+
+        #region Event Channels
+
+        [Header("Event Channels"), Space(10)][SerializeField] private EqStateEventChannel _eqStateEventChannel;
+
+        #endregion Event Channels
 
         private StateMachine _stateMachine;
 
@@ -30,7 +37,7 @@ namespace EarthQuake
 
             // declare states
 
-            // var eqInit = new EqInit(_eqInitDuration);
+            var eqInit = new EqInit(_eqInitDuration);
             var preEq = new PreEq(_preEqDuration);
             var duringEq = new DuringEq(_duringEqDuration);
             var postEq = new PostEq(_postEqDuration);
@@ -39,17 +46,27 @@ namespace EarthQuake
             // var failEq = new FailEq(_failEqDuration);
 
             // define transitions
+            At(eqInit, preEq, CreateFuncPredicate(eqInit));
             At(preEq, duringEq, CreateFuncPredicate(preEq));
-
             At(duringEq, postEq, CreateFuncPredicate(duringEq));
-
             At(postEq, passEq, CreateFuncPredicate(postEq));
-
             At(passEq, idleEq, CreateFuncPredicate(passEq));
 
             // Any(failEq, new FuncPredicate(() => true));
 
-            _stateMachine.SetState(preEq);
+            // set initial state
+            _stateMachine.SetState(eqInit);
+        }
+
+        private void Start()
+        {
+            _stateMachine.OnStateChanged += OnStateChanged;
+        }
+
+        private void OnStateChanged(IState newState)
+        {
+            if (_eqStateEventChannel == null) return;
+            _eqStateEventChannel.Invoke((EqBaseState)newState);
         }
 
         private void Update()
@@ -69,7 +86,7 @@ namespace EarthQuake
 
         private FuncPredicate CreateFuncPredicate(EqBaseState currentRunningState)
         {
-            var tempPredicate = new FuncPredicate(() => currentRunningState.CurrentTime >= _duringEqDuration);
+            var tempPredicate = new FuncPredicate(() => currentRunningState.CurrentTime >= currentRunningState.Duration);
             return tempPredicate;
         }
 
