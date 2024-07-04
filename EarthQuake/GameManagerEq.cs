@@ -86,7 +86,7 @@ namespace EarthQuake
 
         private FuncPredicate CreateFuncPredicate(EqBaseState currentRunningState)
         {
-            var tempPredicate = new FuncPredicate(() => currentRunningState.CurrentTime >= _duringEqDuration);
+            var tempPredicate = new FuncPredicate(() => currentRunningState.CurrentTime >= currentRunningState.Duration);
             return tempPredicate;
         }
 
