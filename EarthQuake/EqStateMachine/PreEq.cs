@@ -1,8 +1,8 @@
-namespace Eq.EqStateMachine
+namespace EarthQuake.EqStateMachine
 {
-    public class PassEq : EqBaseState
+    public class PreEq : EqBaseState
     {
-        public PassEq(float duration) : base(duration)
+        public PreEq(float duration) : base(duration)
         {
         }
 

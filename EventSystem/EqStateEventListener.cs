@@ -1,4 +1,4 @@
-using Eq.EqStateMachine;
+using EarthQuake.EqStateMachine;
 using UnityEngine;
 using UnityEngine.Events;
 
