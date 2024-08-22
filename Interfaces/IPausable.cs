@@ -1,7 +1,4 @@
-﻿using FSM;
-using JetBrains.Annotations;
-
-namespace Interfaces
+﻿namespace Interfaces
 {
 	public interface IPausable
 	{
