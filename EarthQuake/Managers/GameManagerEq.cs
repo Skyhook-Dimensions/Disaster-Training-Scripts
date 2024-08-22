@@ -17,6 +17,8 @@ namespace EarthQuake.Managers
         [SerializeField] private float m_passEqDuration = 5f;
         [SerializeField] private float m_eqInitDuration = 5f;
         // [SerializeField] private float m_failEqDuration = 5f;
+        
+        public float DuringEqDuration => m_duringEqDuration;
 
         #endregion EqState properties
 
@@ -26,44 +28,79 @@ namespace EarthQuake.Managers
 
         #endregion Event Channels
 
+        #region StateTransitionBools
+
+        public bool Passed { get; set; }
+        public bool Retry { get; set; }
+        public bool Failed { get; set; }
+        public bool ShouldTransitionToDuringEq { get; set; }
+        public bool Pause { get; set; }
+
+        #endregion
+        
         private StateMachine m_stateMachine;
+        private EqBaseState m_prevState;
+
+        #region UnityMethods
 
         protected override void Awake()
         {
             base.Awake();
             m_stateMachine = GetComponent<StateMachine>();
 
+            ResetBools();
+            
             // declare states
 
-            var eqInit = new EqInit(m_eqInitDuration);
-            var preEq = new PreEq(m_preEqDuration);
-            var duringEq = new DuringEq(m_duringEqDuration);
-            var postEq = new PostEq(m_postEqDuration);
-            var passEq = new PassEq(m_passEqDuration);
-            var idleEq = new IdleEq(Mathf.Infinity);
-            // var failEq = new FailEq(_failEqDuration);
+            var init = new EqInit(m_eqInitDuration);
+            var pre = new PreEq(m_preEqDuration);
+            var during = new DuringEq(m_duringEqDuration);
+            var post = new PostEq(m_postEqDuration);
+            var pass = new PassEq(m_passEqDuration);
+            var idle = new IdleEq(Mathf.Infinity);
+            var fail = new FailEq(Mathf.Infinity);
+            var pause = new PauseEq(Mathf.Infinity);
 
             // define transitions
-            At(eqInit, preEq, CreateFuncPredicate(eqInit));
-            At(preEq, duringEq, CreateFuncPredicate(preEq));
-            At(duringEq, postEq, CreateFuncPredicate(duringEq));
-            At(postEq, passEq, CreateFuncPredicate(postEq));
-            At(passEq, idleEq, CreateFuncPredicate(passEq));
+            AddTransition(init, pre, CreateFuncPredicate(init));
+            AddTransition(pre, during, new FuncPredicate(() => ShouldTransitionToDuringEq));
+            AddTransition(during, post, new FuncPredicate(() => 
+                !Failed && 
+                during.CurrentTime >= during.Duration));
+            
+            // pass transition
+            AddTransition(post, pass, new FuncPredicate(() => !Failed && Passed));
+            AddTransition(pass, idle, CreateFuncPredicate(pass));
+            
+            // fail transition
+            AddTransition(during, fail, new FuncPredicate(() =>
+                Failed &&
+                during.CurrentTime >= during.Duration));
+            AddTransition(post, fail, new FuncPredicate(() => Failed));
+            
+            // retry transition
+            AddTransition(fail, pre, new FuncPredicate(() => Retry));
 
-            // Any(failEq, new FuncPredicate(() => true));
+            // PauseTransition
+            AddAnyTransition(pause, new FuncPredicate(() =>
+            {
+                m_prevState = (EqBaseState)m_stateMachine.CurrentState;
+                return Pause;
+            }));
+            AddTransition(pause, m_prevState, new FuncPredicate(() => !Pause));
 
             // set initial state
-            m_stateMachine.SetState(eqInit);
+            m_stateMachine.SetState(init);
         }
 
         private void OnEnable()
         {
-            m_stateMachine.OnStateChanged += OnStateChanged;
+            m_stateMachine.onStateChanged += OnStateChanged;
         }
 
         private void OnDisable()
         {
-            m_stateMachine.OnStateChanged -= OnStateChanged;
+            m_stateMachine.onStateChanged -= OnStateChanged;
         }
 
         private void OnStateChanged(IState newState)
@@ -87,14 +124,28 @@ namespace EarthQuake.Managers
             m_stateMachine.OnLateUpdate();
         }
 
+        #endregion UnityMethods
+
+        #region PrivateMethods
+        
+        private void ResetBools()
+        {
+            ShouldTransitionToDuringEq = false;
+            Passed = false;
+            Retry = false;
+            Failed = false;
+        }
+
         private FuncPredicate CreateFuncPredicate(EqBaseState currentRunningState)
         {
             var tempPredicate = new FuncPredicate(() => currentRunningState.CurrentTime >= currentRunningState.Duration);
             return tempPredicate;
         }
 
-        private void At(IState from, IState to, IPredicate condition) => m_stateMachine.AddTransition(from, to, condition);
+        private void AddTransition(IState from, IState to, IPredicate condition) => m_stateMachine.AddTransition(from, to, condition);
 
-        private void Any(IState to, IPredicate condition) => m_stateMachine.AddAnyTransition(to, condition);
+        private void AddAnyTransition(IState to, IPredicate condition) => m_stateMachine.AddAnyTransition(to, condition);
+
+        #endregion PrivateMethods
     }
 }

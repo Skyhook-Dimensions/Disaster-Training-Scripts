@@ -6,11 +6,13 @@ namespace FSM
 {
     public class StateMachine : MonoBehaviour
     {
-        private StateNode _current;
-        private Dictionary<Type, StateNode> _nodes = new();
-        private HashSet<ITransition> _anyTransitions = new();
+        private StateNode m_current;
+        private Dictionary<Type, StateNode> m_nodes = new();
+        private HashSet<ITransition> m_anyTransitions = new();
 
-        public Action<IState> OnStateChanged;
+        public IState CurrentState => m_current.State;
+        
+        public Action<IState> onStateChanged;
 
         public void OnUpdate()
         {
@@ -20,17 +22,17 @@ namespace FSM
                 ChangeState(transition.To);
             }
 
-            _current.State?.OnUpdate();
+            m_current.State?.OnUpdate();
         }
 
         public void OnFixedUpdate()
         {
-            _current.State?.OnFixedUpdate();
+            m_current.State?.OnFixedUpdate();
         }
 
         public void OnLateUpdate()
         {
-            _current.State?.OnLateUpdate();
+            m_current.State?.OnLateUpdate();
         }
 
         /// <summary>
@@ -39,31 +41,31 @@ namespace FSM
         /// <param name="state">The state to set.</param>
         public void SetState(IState state)
         {
-            _current = _nodes[state.GetType()];
-            _current.State?.OnEnter();
+            m_current = m_nodes[state.GetType()];
+            m_current.State?.OnEnter();
         }
 
         private void ChangeState(IState state)
         {
-            if (_current.State == state) return;
-            var previousState = _current.State;
-            var nextState = _nodes[state.GetType()].State;
+            if (m_current.State == state) return;
+            var previousState = m_current.State;
+            var nextState = m_nodes[state.GetType()].State;
 
             previousState?.OnExit();
             nextState?.OnEnter();
-            OnStateChanged?.Invoke(nextState);
-            _current = _nodes[state.GetType()];
+            onStateChanged?.Invoke(nextState);
+            m_current = m_nodes[state.GetType()];
         }
 
         private ITransition GetTransition()
         {
-            foreach (var transition in _anyTransitions)
+            foreach (var transition in m_anyTransitions)
             {
                 if (transition.Condition.Evaluate())
                     return transition;
             }
 
-            foreach (var transition in _current.Transitions)
+            foreach (var transition in m_current.Transitions)
             {
                 if (transition.Condition.Evaluate())
                     return transition;
@@ -79,7 +81,7 @@ namespace FSM
         /// <param name="condition">The condition that must be satisfied for the transition to occur.</param>
         public void AddAnyTransition(IState to, IPredicate condition)
         {
-            _anyTransitions.Add(new Transition(GetOrAddNode(to).State, condition));
+            m_anyTransitions.Add(new Transition(GetOrAddNode(to).State, condition));
         }
 
         /// <summary>
@@ -95,11 +97,11 @@ namespace FSM
 
         private StateNode GetOrAddNode(IState state)
         {
-            var node = _nodes.GetValueOrDefault(state.GetType());
+            var node = m_nodes.GetValueOrDefault(state.GetType());
             if (node == null)
             {
                 node = new StateNode(state);
-                _nodes.Add(state.GetType(), node);
+                m_nodes.Add(state.GetType(), node);
             }
             return node;
         }
