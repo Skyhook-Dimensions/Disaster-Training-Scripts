@@ -51,6 +51,7 @@ namespace EarthQuake.Managers
             ResetBools();
             
             // declare states
+            // Todo : reset state
 
             var init = new EqInit(m_eqInitDuration);
             var pre = new PreEq(m_preEqDuration);
@@ -87,7 +88,7 @@ namespace EarthQuake.Managers
                 m_prevState = (EqBaseState)m_stateMachine.CurrentState;
                 return Pause;
             }));
-            AddTransition(pause, m_prevState, new FuncPredicate(() => !Pause));
+            AddTransition(pause, m_prevState, new FuncPredicate(() => !Pause)); // logic is to resume is wrong, need to fix
 
             // set initial state
             m_stateMachine.SetState(init);

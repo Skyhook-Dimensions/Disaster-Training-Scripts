@@ -1,24 +1,30 @@
-﻿using EarthQuake.EqStateMachine;
+﻿using System;
+using Interfaces;
 using TripleA.ImprovedTimer.Timers;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace EarthQuake
 {
-	public class FlickeringLight : MonoBehaviour
+	public class FlickeringLight : MonoBehaviour, IFlickerer
 	{
+		#region FieldsAndProperties
+
 		[SerializeField] private Light m_light;
 		public Vector2 FlickerInterval { get; set; }
 		public Vector2 LightIntensity { get; set; }
 
 		private CountDownTimer m_timer;
+		private float m_initialIntensity;
+
+		#endregion FieldsAndProperties
 
 		#region UnityMethods
 
 		protected void Awake()
 		{
 			m_timer = new CountDownTimer(Random.Range(FlickerInterval.x, FlickerInterval.y));
+			m_initialIntensity = m_light.intensity;
 		}
 
 		private void OnEnable()
@@ -43,6 +49,28 @@ namespace EarthQuake
 			m_timer.Start();
 		}
 
+		public void Stop()
+		{
+			m_timer.Stop();
+		}
+
+		public void Pause()
+		{
+			m_timer.Pause();
+		}
+
+		public void Resume()
+		{
+			m_timer.Resume();
+		}
+
+		public void Reset()
+		{
+			m_timer.Reset();
+			// TODO: Lerp or Flicker unnecessarily
+			m_light.intensity = m_initialIntensity;
+		}
+
 		#endregion
 		
 		#region PrivateMethods
@@ -64,5 +92,6 @@ namespace EarthQuake
 		}
 
 		#endregion PrivateMethods
+
 	}
 }
