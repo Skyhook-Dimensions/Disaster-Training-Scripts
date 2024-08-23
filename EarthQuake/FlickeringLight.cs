@@ -1,11 +1,11 @@
-﻿using System;
-using Interfaces;
+﻿using Interfaces;
 using TripleA.ImprovedTimer.Timers;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace EarthQuake
 {
+	[System.Serializable]
 	public class FlickeringLight : MonoBehaviour, IFlickerer
 	{
 		#region FieldsAndProperties
@@ -44,30 +44,17 @@ namespace EarthQuake
 
 		#region PublicMethods
 		
-		public void StartLightFlicker()
-		{
-			m_timer.Start();
-		}
+		public void StartLightFlicker() => m_timer.Start();
 
-		public void Stop()
-		{
-			m_timer.Stop();
-		}
+		public void Stop() => m_timer.Stop();
 
-		public void Pause()
-		{
-			m_timer.Pause();
-		}
+		public void Pause() => m_timer.Pause();
 
-		public void Resume()
-		{
-			m_timer.Resume();
-		}
+		public void Resume() => m_timer.Resume();
 
-		public void Reset()
+		public void ResetValues()
 		{
 			m_timer.Reset();
-			// TODO: Lerp or Flicker unnecessarily
 			m_light.intensity = m_initialIntensity;
 		}
 

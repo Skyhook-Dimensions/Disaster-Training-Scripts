@@ -1,10 +1,12 @@
-﻿using FSM;
-using Interfaces;
+﻿using Interfaces;
 using PrimeTween;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace EarthQuake
 {
+	[RequireComponent(typeof(Rigidbody), typeof(Collider))]
+	[System.Serializable]
 	public class ShakingObject : MonoBehaviour, IShakable
 	{
 		#region FieldsAndProperties
@@ -12,6 +14,7 @@ namespace EarthQuake
 		[Header("PhysicsSettings")]
 		[SerializeField] private bool m_shouldUseGravity;
 		[SerializeField] private Rigidbody m_rigidbody;
+		[SerializeField] private Vector3 m_strength;
 
 		private Transform m_tr;
 		private Vector3 m_initialPosition;
@@ -38,12 +41,12 @@ namespace EarthQuake
 
 		#region PublicMethods
 
-		public void StartShake(float duration, Vector3 strength, float delay = 0f)
+		public void StartShake(float duration, float delay = 0f)
 		{
 			m_shakeTween = Tween.ShakeLocalPosition(
 				target: m_tr,
 				duration: duration,
-				strength: strength,
+				strength: m_strength,
 				startDelay: delay,
 				easeBetweenShakes: Ease.Linear
 			);
@@ -64,7 +67,7 @@ namespace EarthQuake
 			if (m_shakeTween.isAlive) m_shakeTween.isPaused = false;
 		}
 		
-		public void Reset()
+		public void ResetValues()
 		{
 			// Todo : Lerp back to initial position
 			m_tr.SetPositionAndRotation(m_initialPosition, m_initialRotation);

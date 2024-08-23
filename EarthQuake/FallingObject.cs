@@ -1,6 +1,4 @@
-﻿using System;
-using FSM;
-using Interfaces;
+﻿using Interfaces;
 using PrimeTween;
 using TripleA.Extensions;
 using UnityEngine;
@@ -9,6 +7,7 @@ using Random = UnityEngine.Random;
 namespace EarthQuake
 {
 	[RequireComponent(typeof(Rigidbody), typeof(Collider))]
+	[System.Serializable]
 	public class FallingObject : MonoBehaviour, IFallable
 	{
 		#region FeildsAndProperties
@@ -69,7 +68,7 @@ namespace EarthQuake
 				
 		}
 
-		public void Reset()
+		public void ResetValues()
 		{
 			m_isFalling = false;
 			m_rigidbody.isKinematic = true;
@@ -85,7 +84,7 @@ namespace EarthQuake
         {
 			m_rigidbody.isKinematic = false;
         	m_rigidbody.AddForceAtPosition(
-        		transform.forward.Multiply(m_force, m_force, m_force), 
+        		m_forcePoint.forward.Multiply(m_force, m_force, m_force), 
         		m_forcePoint.position, ForceMode.Impulse);
         }
 		

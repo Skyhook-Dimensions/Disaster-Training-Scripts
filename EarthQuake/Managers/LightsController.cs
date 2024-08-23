@@ -1,25 +1,21 @@
 ﻿using System.Collections.Generic;
 using EarthQuake.EqStateMachine;
 using FSM;
-using Interfaces;
 using UnityEngine;
 
 namespace EarthQuake.Managers
 {
 	public class LightsController : Controller
 	{
-		[Header("Light Settings")] private List<IFlickerer> m_flickeringLights = new();
+		[Header("Light Settings")]
+		[SerializeField] private List<FlickeringLight> m_flickeringLights;
 		[SerializeField] private Vector2 m_flickerInterval = new(0.5f, 1.5f);
 		[SerializeField] private Vector2 m_lightIntensity = new(0.5f, 1.5f);
 
-		protected override void Awake()
+		private void Start()
 		{
-			base.Awake();
-			_unityEvent.AddListener(StartAction);
-			// Todo: add pause, resume, stop();
-			foreach (IFlickerer flickerer in m_flickeringLights)
+			foreach (FlickeringLight flickeringLight in m_flickeringLights)
 			{
-				var flickeringLight = (FlickeringLight)flickerer;
 				flickeringLight.LightIntensity = m_lightIntensity;
 				flickeringLight.FlickerInterval = m_flickerInterval;
 			}
@@ -28,9 +24,8 @@ namespace EarthQuake.Managers
 		protected override void StartAction(IState state)
 		{
 			if (!(state.GetType() == typeof(DuringEq))) return;
-			foreach (IFlickerer flickerer in m_flickeringLights)
+			foreach (FlickeringLight flickeringLight in m_flickeringLights)
 			{
-				var flickeringLight = (FlickeringLight)flickerer;
 				flickeringLight.StartLightFlicker();
 			}
 		}
@@ -38,31 +33,38 @@ namespace EarthQuake.Managers
 		protected override void PauseAction(IState state)
 		{
 			if (!(state.GetType() == typeof(PauseEq))) return;
-			foreach (IFlickerer flickerer in m_flickeringLights)
+			foreach (FlickeringLight flickeringLight in m_flickeringLights)
 			{
-				var flickeringLight = (FlickeringLight)flickerer;
 				flickeringLight.Pause();
 			}
 		}
 
 		protected override void ResumeAction(IState state)
 		{
-			// Todo
+			return;
+			if (!(GameManagerEq.Instance.PrevState.GetType() == typeof(PauseEq))) return;
+			foreach (FlickeringLight flickeringLight in m_flickeringLights)
+			{
+				flickeringLight.Resume();
+			}
 		}
 
 		protected override void StopAction(IState state)
 		{
 			if (!(state.GetType() == typeof(FailEq) || state.GetType() == typeof(PassEq))) return;
-			foreach (IFlickerer flickerer in m_flickeringLights)
+			foreach (FlickeringLight flickeringLight in m_flickeringLights)
 			{
-				var flickeringLight = (FlickeringLight)flickerer;
 				flickeringLight.Stop();
 			}
 		}
 
 		protected override void ResetAction(IState state)
 		{
-			// Todo
+			if (!(state.GetType() == typeof(ResetEq))) return;
+			foreach (FlickeringLight flickeringLight in m_flickeringLights)
+			{
+				flickeringLight.ResetValues();
+			}
 		}
 	}
 }

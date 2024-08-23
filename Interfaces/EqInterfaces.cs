@@ -8,7 +8,7 @@ namespace Interfaces
 	}
 	public interface IShakable : IPausable, IStoppable, IResetable
 	{
-		void StartShake(float duration, Vector3 strength, float delay = 0f);
+		void StartShake(float duration, float delay = 0f);
 	}
 
 	public interface IFlickerer : IPausable, IStoppable, IResetable

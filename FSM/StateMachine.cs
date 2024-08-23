@@ -12,6 +12,7 @@ namespace FSM
 
         public IState CurrentState => m_current.State;
         
+        // TODO: !!IMPORTANT!! move this event invocation logic to the states' onenter methods
         public Action<IState> onStateChanged;
 
         public void OnUpdate()
