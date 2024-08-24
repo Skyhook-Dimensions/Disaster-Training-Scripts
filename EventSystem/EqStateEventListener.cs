@@ -1,4 +1,5 @@
 using EarthQuake.EqStateMachine;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -6,9 +7,10 @@ namespace EventSystem
 {
     public class EqStateEventListener : EventListener<EqBaseState>
     {
+        public TextMeshProUGUI text;
         public void Test(EqBaseState state)
         {
-            Debug.Log(state.GetType());
+            text.text = state.GetType().ToString();
         }
     }
 }

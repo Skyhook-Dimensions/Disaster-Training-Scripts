@@ -1,3 +1,5 @@
+using EarthQuake.Managers;
+
 namespace EarthQuake.EqStateMachine
 {
     public class PreEq : EqBaseState
@@ -6,14 +8,10 @@ namespace EarthQuake.EqStateMachine
         {
         }
 
-        public override void OnEnter()
-        {
-            base.OnEnter();
-        }
-
         public override void OnExit()
         {
             base.OnExit();
+            GameManagerEq.Instance.PrevState = typeof(PreEq);
         }
     }
 }

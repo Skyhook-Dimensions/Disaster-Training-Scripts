@@ -10,20 +10,15 @@ namespace EarthQuake.Managers
 		[Header("Object Settings")] 
 		[SerializeField] private List<ShakingObject> m_shakingObjects;
 
-		private float m_duration;
-
-		private void Start()
-		{
-			m_duration = GameManagerEq.Instance.DuringEqDuration;
-		}
 
 		protected override void StartAction(IState state)
 		{
+			float duration = GameManagerEq.Instance.DuringEqDuration;
 			if (!(state.GetType() == typeof(DuringEq))) return;
 			foreach (ShakingObject shakingObject in m_shakingObjects)
 			{
-				float delay = Random.Range(0f, m_duration * 0.9f);
-				shakingObject.StartShake(m_duration, delay);
+				float delay = Random.Range(0f, duration * 0.3f);
+				shakingObject.StartShake(duration, delay);
 			}
 		}
 
@@ -38,8 +33,7 @@ namespace EarthQuake.Managers
 
 		protected override void ResumeAction(IState state)
 		{
-			return;
-			if (!(GameManagerEq.Instance.PrevState.GetType() == typeof(PauseEq))) return;
+			if (!(GameManagerEq.Instance.PrevState == typeof(PauseEq))) return;
 			foreach (ShakingObject shakingObject in m_shakingObjects)
 			{
 				shakingObject.Resume();

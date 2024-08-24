@@ -41,8 +41,7 @@ namespace EarthQuake.Managers
 
 		protected override void ResumeAction(IState state)
 		{
-			return;
-			if (!(GameManagerEq.Instance.PrevState.GetType() == typeof(PauseEq))) return;
+			if (!(GameManagerEq.Instance.PrevState == typeof(PauseEq))) return;
 			foreach (FlickeringLight flickeringLight in m_flickeringLights)
 			{
 				flickeringLight.Resume();

@@ -10,19 +10,14 @@ namespace EarthQuake.Managers
 		[Header("Object Settings")] [SerializeField]
 		private List<FallingObject> m_fallingObjects;
 
-		private float m_maxDelay;
-
-		private void Start()
-		{
-			m_maxDelay = GameManagerEq.Instance.DuringEqDuration * 2f;
-		}
 
 		protected override void StartAction(IState state)
 		{
+			float maxDelay = GameManagerEq.Instance.DuringEqDuration * 2f;
 			if (!(state.GetType() == typeof(DuringEq))) return;
 			foreach (FallingObject fallingObject in m_fallingObjects)
 			{
-				fallingObject.StartFalling(m_maxDelay);
+				fallingObject.StartFalling(maxDelay);
 			}
 		}
 
@@ -37,8 +32,7 @@ namespace EarthQuake.Managers
 
 		protected override void ResumeAction(IState state)
 		{
-			return;
-			if (!(GameManagerEq.Instance.PrevState.GetType() == typeof(PauseEq))) return;
+			if (!(GameManagerEq.Instance.PrevState == typeof(PauseEq))) return;
 			foreach (FallingObject fallingObject in m_fallingObjects)
 			{
 				fallingObject.Resume();

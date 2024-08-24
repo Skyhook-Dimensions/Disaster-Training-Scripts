@@ -1,5 +1,6 @@
 ﻿using Interfaces;
 using PrimeTween;
+using TripleA.Extensions;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -14,12 +15,13 @@ namespace EarthQuake
 		[Header("PhysicsSettings")]
 		[SerializeField] private bool m_shouldUseGravity;
 		[SerializeField] private Rigidbody m_rigidbody;
-		[SerializeField] private Vector3 m_strength;
+		[SerializeField] private float m_strength = 0.1f;
 
 		private Transform m_tr;
 		private Vector3 m_initialPosition;
 		private Quaternion m_initialRotation;
 		private Tween m_shakeTween;
+		private Vector3 m_strengthVector;
 
 		#endregion FieldsAndProperties
 
@@ -28,13 +30,15 @@ namespace EarthQuake
         private void Start()
         {
 	        m_tr = transform;
+	        m_strengthVector = Vector3.zero.With(x:m_strength, z:m_strength) + m_tr.forward;
 	        m_initialPosition = m_tr.position;
 	        m_initialRotation = m_tr.rotation;
-	        if (m_rigidbody == null && m_shouldUseGravity)
+	        
+	        if (m_rigidbody == null)
 	        {
 		        m_rigidbody = GetComponent<Rigidbody>();
-		        m_rigidbody.useGravity = m_shouldUseGravity;
 	        }
+	        m_rigidbody.useGravity = m_shouldUseGravity; 
         }
 
         #endregion UnityMethods
@@ -46,7 +50,7 @@ namespace EarthQuake
 			m_shakeTween = Tween.ShakeLocalPosition(
 				target: m_tr,
 				duration: duration,
-				strength: m_strength,
+				strength: m_strengthVector,
 				startDelay: delay,
 				easeBetweenShakes: Ease.Linear
 			);
