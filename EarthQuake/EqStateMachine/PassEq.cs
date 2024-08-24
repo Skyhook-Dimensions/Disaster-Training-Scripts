@@ -1,11 +1,8 @@
-using UnityEngine;
-using FSM;
-
-namespace Eq.EqStateMachine
+namespace EarthQuake.EqStateMachine
 {
-    public class PreEq : EqBaseState
+    public class PassEq : EqBaseState
     {
-        public PreEq(float duration) : base(duration)
+        public PassEq(float duration) : base(duration)
         {
         }
 

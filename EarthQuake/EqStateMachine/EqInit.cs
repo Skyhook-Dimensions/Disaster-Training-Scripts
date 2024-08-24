@@ -1,7 +1,4 @@
-using FSM;
-using UnityEngine;
-
-namespace Eq.EqStateMachine
+namespace EarthQuake.EqStateMachine
 {
     public class EqInit : EqBaseState
     {

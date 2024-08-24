@@ -8,6 +8,7 @@ namespace EventSystem
 
     public abstract class EventListener<T> : MonoBehaviour
     {
+        [Header("Event Listener Fields")]
         [SerializeField] private EventChannel<T> _eventChannel;
         [SerializeField] protected UnityEvent<T> _unityEvent;
 

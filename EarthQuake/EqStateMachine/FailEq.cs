@@ -1,4 +1,4 @@
-namespace Eq.EqStateMachine
+namespace EarthQuake.EqStateMachine
 {
     public class FailEq : EqBaseState
     {
